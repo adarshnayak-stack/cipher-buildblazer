@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 900">
+  <rect width="700" height="900" fill="#020705"/>
+  <circle cx="350" cy="320" r="120" fill="none" stroke="#00ff66" stroke-width="4" opacity=".7"/>
+  <path d="M150 760c20-150 110-220 200-220s180 70 200 220" fill="none" stroke="#00ff66" stroke-width="5" opacity=".7"/>
+  <text x="350" y="835" text-anchor="middle" fill="#7dffad" font-family="monospace" font-size="26" letter-spacing="5">CIPHER</text>
+  <text x="350" y="870" text-anchor="middle" fill="#3c8d59" font-family="monospace" font-size="15" letter-spacing="3">PHOTO NOT AVAILABLE</text>
+</svg>
