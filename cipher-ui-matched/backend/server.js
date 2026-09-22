@@ -6,6 +6,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { pool, query } from './db.js';
@@ -33,6 +34,17 @@ const api = express.Router();
 api.use(publicLimiter);
 
 const publicUrl = (req, filename) => `${(process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '')}/uploads/${filename}`;
+
+async function ensureInitialAdmin() {
+  const password = process.env.ADMIN_INITIAL_PASSWORD;
+  if (!password) return;
+  if (password.length < 12) throw new Error('ADMIN_INITIAL_PASSWORD must be at least 12 characters.');
+  const existing = await query('SELECT id FROM admins LIMIT 1');
+  if (existing.rowCount) return;
+  const hash = await bcrypt.hash(password, 12);
+  await query('INSERT INTO admins(password_hash) VALUES($1)', [hash]);
+  console.log('Initial admin account created. Remove ADMIN_INITIAL_PASSWORD from the environment.');
+}
 
 async function getContent() {
   const [site, events, team] = await Promise.all([
@@ -140,6 +152,7 @@ app.use((err,req,res,_)=>{console.error(err);const status=err.status|| (err.code
 const port=Number(process.env.PORT)||5000;
 await query('CREATE EXTENSION IF NOT EXISTS pgcrypto');
 await query(fs.readFileSync(path.join(__dirname, "schema.sql"), "utf8"));
+await ensureInitialAdmin();
 await seed();
 await syncMediaPaths();
 app.listen(port,()=>console.log(`CIPHER backend running on http://localhost:${port}`));
